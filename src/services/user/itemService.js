@@ -24,10 +24,16 @@ const getNearbyItems = async ({ lat, lng, radius = 500 }) => {
     const stores = await Store.findAll({
         where: { is_verified: true },
         include: [{
-        model: Item,
-        as: 'items',
-        where: { status: 'ACTIVE' },
-        required: false,
+            model: Item,
+            as: 'items',
+            where: { status: 'ACTIVE' },
+            required: false,
+            include: [{
+                model: Reservation,
+                as: 'reservations',
+                where: { status: { [Op.in]: ['CONFIRMED', 'NOSHOW', 'PICKUP'] } },
+                required: false,
+            }],
         }],
     });
 
@@ -54,16 +60,19 @@ const getNearbyItems = async ({ lat, lng, radius = 500 }) => {
         lat: store.lat,
         lng: store.lng,
         distance,
-        items: store.items.map((item) => ({
-        itemId: item.itemId,
-        name: item.name,
-        price: item.price,
-        type: item.type,
-        pickupEnd: item.pickup_end,
-        status: item.status,
-        availableQty: item.quantity,
-        image: item.image,
-        })),
+        items: store.items.map((item) => {
+            const reservedQty = item.reservations.reduce((sum, r) => sum + r.quantity, 0);  // 추가
+            return {
+                itemId: item.itemId,
+                name: item.name,
+                price: item.price,
+                type: item.type,
+                pickupEnd: item.pickup_end,
+                status: item.status,
+                availableQty: item.quantity - reservedQty,
+                image: item.image,
+            }
+        }),
     }));
 };
 

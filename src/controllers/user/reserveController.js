@@ -1,4 +1,4 @@
-const { getItemDetail, createReservation } = require('../../services/user/reserveService');
+const { getItemDetail, createReservation, getReservations, getReservationDetail } = require('../../services/user/reserveService');
 
 exports.getItemDetail = async (req, res) => {
     try {
@@ -34,6 +34,35 @@ exports.createReservation = async (req, res) => {
             error: { code: err.code, availableQty: err.availableQty },
         });
         }
+        res.status(err.status || 500).json({
+        success: false,
+        message: err.message,
+        error: { code: err.code },
+        });
+    }
+};
+
+exports.getReservations = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const result = await getReservations(userId);
+        res.status(200).json({ success: true, data: { reservations: result } });
+    } catch (err) {
+            res.status(err.status || 500).json({
+            success: false,
+            message: err.message,
+            error: { code: err.code },
+        });
+    }
+};
+
+exports.getReservationDetail = async (req, res) => {
+    try {
+        const { reservationId } = req.params;
+        const userId = req.user.userId;
+        const result = await getReservationDetail(reservationId, userId);
+        res.status(200).json({ success: true, data: result });
+    } catch (err) {
         res.status(err.status || 500).json({
         success: false,
         message: err.message,

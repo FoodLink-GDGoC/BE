@@ -1,4 +1,5 @@
-const { Item, Store } = require('../../models');
+const { Item, Store, Reservation } = require('../../models');
+const { Op } = require('sequelize');
 
 const getNearbyItems = async ({ lat, lng, radius = 500 }) => {
     if (!lat || !lng) {
@@ -66,4 +67,59 @@ const getNearbyItems = async ({ lat, lng, radius = 500 }) => {
     }));
 };
 
-module.exports = { getNearbyItems };
+const getStoreItems = async (storeId) => {
+    const store = await Store.findByPk(storeId);
+
+    if (!store) {
+        const err = new Error('존재하지 않는 매장이에요.');
+        err.code = 'STORE_NOT_FOUND';
+        err.status = 404;
+        throw err;
+    }
+
+    if (!store.is_verified) {
+        const err = new Error('인증되지 않은 매장이에요.');
+        err.code = 'STORE_NOT_VERIFIED';
+        err.status = 403;
+        throw err;
+    }
+
+    const items = await Item.findAll({
+        where: { storeId: storeId, status: 'ACTIVE' },
+        include: [{
+        model: Reservation,
+        as: 'reservations',
+        where: { status: { [Op.in]: ['CONFIRMED', 'NOSHOW', 'PICKUP'] } },
+        required: false,
+        }],
+    });
+
+    return {
+        store: {
+        storeId: store.storeId,
+        storeName: store.storeName,
+        address: store.address,
+        storeNumber: store.storeNumber,
+        is_verified: store.is_verified,
+        },
+        items: items.map((item) => {
+        const reservedQty = item.reservations.reduce((sum, r) => sum + r.quantity, 0);
+        return {
+            itemId: item.itemId,
+            name: item.name,
+            quantity: item.quantity,
+            availableQty: item.quantity - reservedQty,
+            reservedQty,
+            price: item.price,
+            type: item.type,
+            pickupStart: item.pickup_start,
+            pickupEnd: item.pickup_end,
+            status: item.status,
+            image: item.image,
+            createdAt: item.createdAt,
+        };
+        }),
+    };
+};
+
+module.exports = { getNearbyItems, getStoreItems };

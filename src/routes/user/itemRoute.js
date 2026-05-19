@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyAccessToken } = require('../../middlewares/authMiddleware');
-const { getNearbyItems } = require('../../controllers/user/itemController');
+const { getNearbyItems, getStoreItems } = require('../../controllers/user/itemController');
 
 /**
  * @swagger
@@ -45,5 +45,29 @@ const { getNearbyItems } = require('../../controllers/user/itemController');
  *         description: 위치 정보 누락 또는 잘못된 좌표
  */
 router.get('/nearby', verifyAccessToken, getNearbyItems);
+
+/**
+ * @swagger
+ * /api/user/items/stores/{storeId}:
+ *   get:
+ *     summary: 특정 매장 잔여 아이템 목록 조회
+ *     description: 특정 매장의 아이템 목록을 조회합니다.
+ *     tags: [USER-items]
+ *     parameters:
+ *       - in: path
+ *         name: storeId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: 아이템 목록 조회 성공
+ *       403:
+ *         description: 인증되지 않은 매장
+ *       404:
+ *         description: 존재하지 않는 매장
+ */
+router.get('/stores/:storeId', verifyAccessToken, getStoreItems);
 
 module.exports = router;

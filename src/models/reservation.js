@@ -5,7 +5,7 @@ module.exports = class Reservation extends Sequelize.Model {
     return super.init({
       reservationId: { type: Sequelize.BIGINT, primaryKey: true, autoIncrement: true },
       quantity: { type: Sequelize.INTEGER, allowNull: false },
-      status: { type: Sequelize.ENUM('CONFIRMED', 'PICKUP', 'NOSHOW', 'CANCEL'), allowNull: false, defaultValue: 'CONFIRMED' },
+      status: { type: Sequelize.ENUM('CONFIRMED', 'PICKUP', 'NOSHOW', 'CANCEL', 'EXPIRED'), allowNull: false, defaultValue: 'CONFIRMED' },
       pickedUpAt: { type: Sequelize.DATE },
       userId: { type: Sequelize.BIGINT, allowNull: false },
       itemId: { type: Sequelize.BIGINT, allowNull: false },

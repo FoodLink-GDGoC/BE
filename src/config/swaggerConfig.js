@@ -6,9 +6,9 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-        title: 'Bookridge API 문서',
+        title: 'FoodLink API 문서',
         version: '1.0.0',
-        description: 'Bookridge 프로젝트 API 명세서',
+        description: 'FoodLink 프로젝트 API 명세서',
         },
         components: {
         securitySchemes: {

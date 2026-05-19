@@ -10,7 +10,7 @@ const upload = multer({
         contentType: multerS3.AUTO_CONTENT_TYPE,
         key: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `bookridge/${uniqueSuffix}${path.extname(file.originalname)}`);
+        cb(null, `foodlink/${uniqueSuffix}${path.extname(file.originalname)}`);
         },
     }),
 });

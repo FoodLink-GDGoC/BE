@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const signup = async ({ nickname, email, password, passwordConfirm }) => {
-  // 필수 필드 검증
   const requiredFields = { nickname, email, password, passwordConfirm };
   const missingFields = Object.entries(requiredFields)
     .filter(([_, v]) => !v)
@@ -44,7 +43,6 @@ const signup = async ({ nickname, email, password, passwordConfirm }) => {
 };
 
 const login = async ({ email, password }) => {
-  // 필수 필드 검증
   const requiredFields = { email, password };
   const missingFields = Object.entries(requiredFields)
     .filter(([_, v]) => !v)
@@ -58,16 +56,14 @@ const login = async ({ email, password }) => {
     throw err;
   }
 
-  // 유저 존재 여부
   const user = await User.findOne({ where: { email } });
   if (!user) {
-    const err = new Error('가입되지 않은 이메일입니다.');
+    const err = new Error('가입되지 않은 이메일이에요.');
     err.code = 'USER_NOT_FOUND';
     err.status = 404;
     throw err;
   }
 
-  // 비밀번호 확인
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
     const err = new Error('이메일 또는 비밀번호가 올바르지 않아요.');

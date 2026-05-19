@@ -10,7 +10,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - bookridge-network
+      - foodlink-network
 
   mysql:
     container_name: mysql-container
@@ -23,7 +23,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
-      - bookridge-network
+      - foodlink-network
 
   nginx:
     container_name: nginx-container
@@ -34,10 +34,10 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
-      - bookridge-network
+      - foodlink-network
 
 networks:
-  bookridge-network:
+  foodlink-network:
     driver: bridge
 
 volumes:

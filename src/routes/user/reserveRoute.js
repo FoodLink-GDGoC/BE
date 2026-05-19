@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyAccessToken } = require('../../middlewares/authMiddleware');
-const { getItemDetail, createReservation } = require('../../controllers/user/reserveController');
+const { getItemDetail, createReservation, getReservations, getReservationDetail } = require('../../controllers/user/reserveController');
 
 /**
  * @swagger
@@ -73,6 +73,48 @@ router.get('/items/:itemId', verifyAccessToken, getItemDetail);
  */
 router.post('/items/:itemId', verifyAccessToken, createReservation);
 
+/**
+ * @swagger
+ * /api/user/reserve:
+ *   get:
+ *     summary: 예약 목록 조회
+ *     description: 로그인한 유저의 예약 목록을 조회합니다.
+ *     tags: [USER-reserve]
+ *     security:
+ *       - Authorization: []
+ *     responses:
+ *       200:
+ *         description: 예약 목록 조회 성공
+ *       401:
+ *         description: 비로그인
+ */
+router.get('', verifyAccessToken, getReservations);
+
+/**
+ * @swagger
+ * /api/user/reserve/reservations/{reservationId}:
+ *   get:
+ *     summary: 예약 상세 정보
+ *     description: 특정 예약의 상세 정보를 조회합니다. 로그인 필요.
+ *     tags: [USER-reserve]
+ *     security:
+ *       - Authorization: []
+ *     parameters:
+ *       - in: path
+ *         name: reservationId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: 예약 상세 조회 성공
+ *       403:
+ *         description: 접근 권한 없음
+ *       404:
+ *         description: 존재하지 않는 예약
+ */
+router.get('/reservations/:reservationId', verifyAccessToken, getReservationDetail);
 
 
 module.exports = router;

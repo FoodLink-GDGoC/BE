@@ -61,7 +61,7 @@ const getNearbyItems = async ({ lat, lng, radius = 500 }) => {
         lng: store.lng,
         distance,
         items: store.items.map((item) => {
-            const reservedQty = item.reservations.reduce((sum, r) => sum + r.quantity, 0);  // 추가
+            const reservedQty = item.reservations.reduce((sum, r) => sum + r.quantity, 0);
             return {
                 itemId: item.itemId,
                 name: item.name,

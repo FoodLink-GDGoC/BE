@@ -1,14 +1,48 @@
 const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.js')[env];
+const config = require('../config/config.js')[env];
+const fs = require('fs');
+const path = require('path');
 const db = {};
 
-let sequelize = new Sequelize(config.database, config.username, config.password, config);
-
+const sequelize = new Sequelize(
+  config.database, config.username, config.password, config,
+);
 db.sequelize = sequelize;
-db.Sequelize = Sequelize;
 
-//아래 양식으로 모델 생성
-// db.subscriber = require("./subscriber.js")(sequelize, Sequelize);
+const basename = path.basename(__filename);
+
+function listJsFiles(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files = [];
+  for (const e of entries) {
+    const full = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      files.push(...listJsFiles(full));
+    } else if (e.isFile()) {
+      const ext = path.extname(e.name).toLowerCase();
+      const base = path.basename(e.name);
+      if (ext === '.js' && base !== basename && base !== 'index.js') {
+        files.push(full);
+      }
+    }
+  }
+  return files;
+}
+
+const modelFiles = listJsFiles(__dirname);
+
+for (const filePath of modelFiles) {
+  const Model = require(filePath);
+  if (!Model || typeof Model.init !== 'function') continue;
+  db[Model.name] = Model;
+  Model.init(sequelize);
+}
+
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
 module.exports = db;

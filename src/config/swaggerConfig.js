@@ -30,7 +30,7 @@ const options = {
             description: '로컬 개발 서버',
         },
         {
-            url: 'http://15.164.218.166',
+            url: 'http://15.164.165.76',
             description: '원격 개발 서버',
         },
         ],

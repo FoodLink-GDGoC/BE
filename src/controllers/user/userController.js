@@ -2,7 +2,7 @@ const userService = require('../../services/user/userService');
 
 exports.signup = async (req, res) => {
   try {
-    const user = await userService.register(req.body);
+    const user = await userService.signup(req.body);
     res.status(201).json({
       success: true,
       message: '회원가입이 완료됐어요.',

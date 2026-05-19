@@ -71,14 +71,14 @@ const getStoreItems = async (storeId) => {
     const store = await Store.findByPk(storeId);
 
     if (!store) {
-        const err = new Error('존재하지 않는 매장이에요.');
+        const err = new Error('존재하지 않는 매장입니다.');
         err.code = 'STORE_NOT_FOUND';
         err.status = 404;
         throw err;
     }
 
     if (!store.is_verified) {
-        const err = new Error('인증되지 않은 매장이에요.');
+        const err = new Error('인증되지 않은 매장입니다.');
         err.code = 'STORE_NOT_VERIFIED';
         err.status = 403;
         throw err;

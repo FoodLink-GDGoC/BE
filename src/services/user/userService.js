@@ -61,7 +61,7 @@ const login = async ({ email, password }) => {
   // 유저 존재 여부
   const user = await User.findOne({ where: { email } });
   if (!user) {
-    const err = new Error('가입되지 않은 이메일이에요.');
+    const err = new Error('가입되지 않은 이메일입니다.');
     err.code = 'USER_NOT_FOUND';
     err.status = 404;
     throw err;

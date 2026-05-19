@@ -1,4 +1,4 @@
-const { getNearbyItems } = require('../../services/user/itemService');
+const { getNearbyItems, getStoreItems } = require('../../services/user/itemService');
 
 exports.getNearbyItems = async (req, res) => {
     try {
@@ -13,6 +13,20 @@ exports.getNearbyItems = async (req, res) => {
             error: { code: err.code, fields: err.fields },
         });
         }
+        res.status(err.status || 500).json({
+        success: false,
+        message: err.message,
+        error: { code: err.code },
+        });
+    }
+};
+
+exports.getStoreItems = async (req, res) => {
+    try {
+        const { storeId } = req.params;
+        const result = await getStoreItems(storeId);
+        res.status(200).json({ success: true, data: result });
+    } catch (err) {
         res.status(err.status || 500).json({
         success: false,
         message: err.message,

@@ -17,7 +17,7 @@ sequelize.sync({ alter: true })
 
 // 미들웨어
 app.use(cors({
-    origin: true,
+    origin: [ 'https://foodlink-gdgoc.vercel.app' ],
     credentials: true,
     exposedHeaders: ['Authorization'],
 }));

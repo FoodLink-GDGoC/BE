@@ -133,20 +133,6 @@ MySQL 데이터는 `mysql-data` Named Volume으로 관리되어 컨테이너를 
 **6. Docker Compose 기반 멀티 컨테이너 운영 및 GitHub Actions CD**
 Node.js, MySQL, Nginx 세 컨테이너를 `foodlink-network`로 묶어 단일 `docker-compose.yml`로 관리합니다. Nginx는 Let's Encrypt SSL 인증서를 볼륨으로 마운트하여 HTTPS 리버스 프록시 역할을 수행합니다. `main` 브랜치에 PR이 머지될 때마다 GitHub Actions `deploy.yml`이 자동 실행되며, 총 18회의 배포 이력이 Actions 탭에서 확인됩니다.
 
-/*---
-
-## 트러블슈팅 및 기술적 고민
-
-> 이 섹션은 코드 구조에서 추론 가능한 고민 포인트를 기술했습니다. 실제 경험은 아래 질문을 참고해 직접 작성해 주세요.
-
-**환경 변수 관리 전략**
-`docker-compose.yml`에서 `env_file: .env`와 `${DB_PASSWORD}`, `${DB_NAME}` 방식으로 환경 변수를 분리한 것으로 보입니다. 로컬 개발과 운영 환경의 환경 변수를 어떻게 구분하고 안전하게 관리했는지 추가로 기술할 수 있습니다.
-
-**추가 입력 필요**:
-- GitHub Actions CD 워크플로우에서 서버 SSH 접속 방식(예: appleboy/ssh-action 등)과 배포 스크립트 구성에서 어떤 어려움이 있었나요?
-- MySQL 컨테이너가 완전히 시작되기 전에 Node.js가 연결을 시도하는 "race condition" 문제를 겪었나요? 해결 방법이 있었나요?
-- Sequelize 모델 설계 시 어떤 연관 관계(Association)를 구성했나요?
-*/
 ---
 
 ## 설치 및 실행 방법

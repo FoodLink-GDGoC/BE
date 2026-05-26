@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const reservationController = require('../controllers/reservationController');
+
 /**
  * @swagger
  * /api/store/reservations:
@@ -17,37 +19,15 @@ const router = express.Router();
  *           type: string
  *           enum:
  *             - CONFIRMED
- *             - COMPLETED
- *             - CANCELED
+ *             - PICKUP
  *             - NOSHOW
+ *             - CANCEL
+ *             - EXPIRED
  *         description: 예약 상태 필터
  *     responses:
  *       200:
  *         description: 예약 목록 조회 성공
  */
-router.get('/', async (req, res, next) => {
-    try {
-        const { status } = req.query;
-
-        const mockReservations = [
-            {
-                reservationId: 12,
-                customerName: '홍길동',
-                customerPhone: '010-1234-5678',
-                productName: '크루아상',
-                pickupTime: '19:30',
-                status: 'CONFIRMED'
-            }
-        ];
-
-        const filteredReservations = status
-            ? mockReservations.filter(reservation => reservation.status === status)
-            : mockReservations;
-
-        res.status(200).json(filteredReservations);
-    } catch (error) {
-        next(error);
-    }
-});
+router.get('/', reservationController.getReservations);
 
 module.exports = router;

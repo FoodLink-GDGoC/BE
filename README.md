@@ -170,6 +170,8 @@ docker compose logs -f node
 ```
 
 ## 폴더 구조
+
+```
 BE/
 ├── .github/                # GitHub Actions 워크플로우 및 이슈/PR 템플릿
 │   └── workflows/
@@ -182,8 +184,7 @@ BE/
 ├── docker-compose.yml      # Node, MySQL, Nginx 멀티 컨테이너 구성
 ├── package.json            # 의존성 및 npm 스크립트 정의
 └── .gitignore
-
-> `src/` 내부 구조(routes, controllers, models, middlewares 등)는 직접 접근이 제한되어 확인하지 못했습니다. 실제 구조에 맞게 보완해 주세요.
+```
 
 ---
 

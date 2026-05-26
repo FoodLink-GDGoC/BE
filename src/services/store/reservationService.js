@@ -1,4 +1,4 @@
-const { Reservation, User, Item } = require('../models');
+const { Reservation, User, Item } = require('../../models');
 
 exports.getReservations = async (status) => {
     const where = {};

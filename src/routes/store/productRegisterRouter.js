@@ -1,6 +1,13 @@
+/**
+ * @swagger
+ * tags:
+ *   name: STORE-product
+ *   description: 매장 product
+ */
 const express = require('express');
 const router = express.Router();
 
+const { verifyAccessToken } = require('../../middlewares/authMiddleware');
 const productController = require('../../controllers/store/productController');
 
 /**
@@ -9,8 +16,9 @@ const productController = require('../../controllers/store/productController');
  *   post:
  *     summary: 상품 등록
  *     description: 점주가 마감 직전의 할인 상품을 등록합니다.
- *     tags:
- *       - STORE-products
+ *     tags: [STORE-product]
+ *     security:
+ *       - Authorization: []
  *     requestBody:
  *       required: true
  *       content:
@@ -55,6 +63,6 @@ const productController = require('../../controllers/store/productController');
  *       400:
  *         description: 필수 입력값 누락
  */
-router.post('/', productController.registerProduct);
+router.post('/add', verifyAccessToken, productController.registerProduct);
 
 module.exports = router;

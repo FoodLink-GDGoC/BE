@@ -2,7 +2,8 @@ const productService = require('../../services/store/productService');
 
 exports.registerProduct = async (req, res, next) => {
     try {
-        const item = await productService.registerProduct(req.body);
+        const storeId = req.user.storeId;
+        const item = await productService.registerProduct(req.body, storeId);
 
         res.status(201).json({
             success: true,

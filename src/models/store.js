@@ -6,11 +6,13 @@ module.exports = class Store extends Sequelize.Model {
       storeId: { type: Sequelize.BIGINT, primaryKey: true, autoIncrement: true },
       storeName: { type: Sequelize.STRING, allowNull: false },
       ownerName: { type: Sequelize.STRING, allowNull: false },
+      email: { type: Sequelize.STRING, allowNull: false},
       address: { type: Sequelize.STRING, allowNull: false },
       lat: { type: Sequelize.FLOAT },
       lng: { type: Sequelize.FLOAT },
       is_verified: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
       storeNumber: { type: Sequelize.STRING, allowNull: false },
+      password: { type: Sequelize.STRING, allowNull: false },
     }, {
       sequelize,
       timestamps: true,

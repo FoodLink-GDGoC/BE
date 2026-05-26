@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyAccessToken } = require('../../middlewares/authMiddleware');
-const { signup, login } = require('../../controllers/store/storeController');
+const { signup, login, logout } = require('../../controllers/store/storeController');
 
 /**
  * @swagger
@@ -268,6 +268,42 @@ router.post('/signup', signup);
  */
 router.post('/login', login);
 
-// router.post('/logout', logout)
+/**
+ * @swagger
+ * /api/store/accounts/logout:
+ *   post:
+ *     summary: 매장 로그아웃
+ *     tags: [STORE-accounts]
+ *     security:
+ *       - Authorization: []
+ *     responses:
+ *       200:
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: 로그아웃 됐어요.
+ *       401:
+ *         description: 토큰 없음 또는 만료
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: 인증이 필요해요.
+ */
+router.post('/logout', verifyAccessToken, logout);
 
 module.exports = router;

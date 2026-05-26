@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const reservationController = require('../../controllers/store/reservationController');
+
 /**
  * @swagger
  * /api/store/reservations/{reservationId}/pickup:
@@ -21,27 +23,9 @@ const router = express.Router();
  *         description: 픽업 완료 처리 성공
  *       400:
  *         description: 이미 처리된 예약
+ *       404:
+ *         description: 존재하지 않는 예약
  */
-router.patch('/:reservationId/pickup', async (req, res, next) => {
-    try {
-        const { reservationId } = req.params;
-
-        const existingReservationIds = [1, 2, 3];
-
-        if (!existingReservationIds.includes(Number(reservationId))) {
-            return res.status(404).json({
-                success: false,
-                message: '존재하지 않는 예약입니다.'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `예약 번호 ${reservationId}번이 픽업 완료 처리되었습니다.`
-        });
-    } catch (error) {
-        next(error);
-    }
-});
+router.patch('/:reservationId/pickup', reservationController.pickupReservation);
 
 module.exports = router;

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const productController = require('../../controllers/store/productController');
+
 /**
  * @swagger
  * /api/store/item/add:
@@ -34,14 +36,15 @@ const router = express.Router();
  *                 example: 0
  *               type:
  *                 type: string
+ *                 enum:
+ *                   - GIVE
+ *                   - SELL
  *                 example: GIVE
  *               pickupStart:
  *                 type: string
- *                 format: date-time
  *                 example: 2026-05-18T17:00:00.000Z
  *               pickupEnd:
  *                 type: string
- *                 format: date-time
  *                 example: 2026-05-18T19:00:00.000Z
  *               image:
  *                 type: string
@@ -52,43 +55,6 @@ const router = express.Router();
  *       400:
  *         description: 필수 입력값 누락
  */
-router.post('/', async (req, res, next) => {
-    try {
-        const { name, quantity, price, type, pickupStart, pickupEnd, image } = req.body;
-
-        const missingFields = [];
-
-        if (!name) missingFields.push('name');
-        if (quantity === undefined) missingFields.push('quantity');
-        if (price === undefined) missingFields.push('price');
-        if (!type) missingFields.push('type');
-        if (!pickupStart) missingFields.push('pickupStart');
-        if (!pickupEnd) missingFields.push('pickupEnd');
-
-        if (missingFields.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: '필수 입력값이 누락되었습니다.',
-                missingFields
-            });
-        }
-
-        res.status(201).json({
-            success: true,
-            message: '상품이 정상적으로 등록되었습니다.',
-            data: {
-                name,
-                quantity,
-                price,
-                type,
-                pickupStart,
-                pickupEnd,
-                image
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
-});
+router.post('/', productController.registerProduct);
 
 module.exports = router;

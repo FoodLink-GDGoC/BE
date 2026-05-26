@@ -1,6 +1,6 @@
 const { Reservation, User, Item } = require('../../models');
 
-exports.getReservations = async (status) => {
+exports.getReservations = async (status, storeId) => {
     const where = {};
 
     if (status) {
@@ -18,6 +18,7 @@ exports.getReservations = async (status) => {
             {
                 model: Item,
                 as: 'item',
+                where: { storeId },
                 attributes: [
                     'itemId',
                     'name',

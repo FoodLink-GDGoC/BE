@@ -3,8 +3,9 @@ const reservationService = require('../../services/store/reservationService');
 exports.getReservations = async (req, res, next) => {
     try {
         const { status } = req.query;
+        const storeId = req.user.storeId;
 
-        const reservations = await reservationService.getReservations(status);
+        const reservations = await reservationService.getReservations(status, storeId);
 
         res.status(200).json(reservations);
     } catch (error) {

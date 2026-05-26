@@ -1,6 +1,6 @@
 const { Item } = require('../../models');
 
-exports.registerProduct = async (body) => {
+exports.registerProduct = async (body, storeId) => {
     const {
         name,
         quantity,
@@ -35,7 +35,7 @@ exports.registerProduct = async (body) => {
         pickup_start: pickupStart,
         pickup_end: pickupEnd,
         image,
-        storeId: 1
+        storeId: storeId
     });
 
     return item;

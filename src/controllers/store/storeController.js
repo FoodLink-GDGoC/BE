@@ -1,16 +1,24 @@
-const userService = require('../../services/user/userService');
+const storeService = require('../../services/store/storeService');
 
 exports.signup = async (req, res) => {
   try {
-    const user = await userService.signup(req.body);
+    const store = await storeService.signup(req.body);
     res.status(201).json({
       success: true,
-      message: '회원가입이 완료됐어요.',
+      message: '매장 회원가입이 완료됐어요. 인증 검토 후 승인됩니다.',
       data: {
-        userId: user.userId,
-        nickname: user.nickname,
-        point: user.point,
-        createdAt: user.createdAt,
+        storeId: store.storeId,
+        storeName: store.storeName,
+        ownerName: store.ownerName,
+        email: store.email,
+        address: store.address,
+        lat: store.lat,
+        lng: store.lng,
+        storeNumber: store.storeNumber,
+        is_verified:store.is_verified,
+        createdAt: store.createdAt,
+        verifiedImageId: store.verifiedImageId,
+        imageUrl: store.imageUrl,
       },
     });
   } catch (err) {
@@ -19,6 +27,13 @@ exports.signup = async (req, res) => {
         success: false,
         message: err.message,
         error: { code: err.code, fields: err.fields },
+      });
+    }
+    if (err.code === 'DUPLICATE_STORE_NUMBER') {
+      return res.status(409).json({
+        success: false,
+        message: err.message,
+        error: { code: err.code, field: 'storeNumber' },
       });
     }
     if (err.code === 'DUPLICATE_EMAIL') {
@@ -38,18 +53,19 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { accessToken, refreshToken, user } = await userService.login(req.body);
+    const { accessToken, refreshToken, store } = await storeService.login(req.body);
     res.status(200).json({
       success: true,
       message: '로그인 성공',
       data: {
         accessToken,
         refreshToken,
-        user: {
-          userId: user.userId,
-          nickname: user.nickname,
-          email: user.email,
-          point: user.point,
+        store: {
+          storeId: store.storeId,
+          storeName: store.storeName,
+          ownerName: store.ownerName,
+          email: store.email,
+          is_verified: store.is_verified,
         },
       },
     });

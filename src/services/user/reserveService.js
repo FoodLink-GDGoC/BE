@@ -1,4 +1,4 @@
-const { Item, Store, Reservation, User } = require('../../models');
+const { Item, Store, Reservation, User, sequelize } = require('../../models');
 const { Op } = require('sequelize');
 
 const getItemDetail = async (itemId) => {
@@ -95,11 +95,19 @@ const createReservation = async (itemId, quantity, userId) => {
         throw err;
     }
 
-    const reservation = await Reservation.create({
-        userId,
-        itemId,
-        quantity,
-        status: 'CONFIRMED',
+    const reservation = await sequelize.transaction(async (t) => {
+        const reservation = await Reservation.create({
+            userId,
+            itemId,
+            quantity,
+            status: 'CONFIRMED',
+        }, { transaction: t });
+
+        if (quantity === availableQty) {
+            await item.update({ status: 'RESERVED' }, { transaction: t });
+        }
+
+        return reservation;
     });
 
     return {
@@ -118,6 +126,7 @@ const createReservation = async (itemId, quantity, userId) => {
             storeName: item.store.storeName,
         },
     };
+    
 };
 
 const getReservations = async (userId) => {

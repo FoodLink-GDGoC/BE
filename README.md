@@ -167,6 +167,7 @@ docker compose ps
 
 # 로그 확인
 docker compose logs -f node
+```
 
 ## 폴더 구조
 BE/

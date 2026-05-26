@@ -7,38 +7,61 @@
 
 ## 프로젝트 소개
 
-FoodLink는 GDGoC(Google Developer Groups on Campus) 팀 프로젝트로 개발된 서비스입니다. 본 저장소(`BE`)는 그 백엔드 서버 구현체입니다.
+FoodLink는 **위치 기반 실시간 마감 할인 음식 공유 플랫폼**입니다. GDGoC Solution Challenge 출품작으로, 3인 팀(백엔드 2명, 프론트엔드 1명)이 함께 개발했습니다.
 
-서버는 Node.js와 Express(v5)를 기반으로 하며, Sequelize ORM을 통해 MySQL 데이터베이스와 연동합니다. 사용자 인증은 JWT와 bcrypt를 활용하며, 파일 업로드는 multer와 AWS S3를 통해 처리합니다. Swagger를 통한 API 문서화가 포함되어 있어 프론트엔드 팀과의 협업을 체계적으로 지원합니다.
+매년 전 세계에서 막대한 양의 음식물이 낭비되는 한편, 학생·자취생·취약계층은 고물가로 인한 식비 부담을 겪고 있습니다. 소규모 자영업자는 당일 미판매 상품을 폐기하면서 경제적 손실과 폐기 비용이라는 이중고를 안고 있습니다. FoodLink는 이처럼 서로 다른 문제를 가진 두 주체—소상공인과 지역 거주자—를 실시간으로 연결하여 자원 순환 커뮤니티를 형성하는 것을 목표로 합니다.
 
-배포 환경은 Docker Compose로 Node.js 애플리케이션, MySQL, Nginx를 하나의 네트워크로 묶어 운영하며, GitHub Actions를 통한 CD(지속적 배포) 파이프라인이 구성되어 있습니다. `api.surunserver.store` 도메인에 HTTPS(Let's Encrypt)로 서비스되는 것이 설정 파일에서 확인됩니다.
+단순한 할인 앱과 달리, FoodLink는 대형 프랜차이즈가 아닌 **동네 카페·마트·소규모 식당**을 주요 참여 대상으로 삼으며, 금액 할인율 중심이 아닌 **실시간 위치와 유통기한 임박도** 기반의 매칭 시스템을 채택합니다. 나아가 미판매분을 인근 복지기관에 자동 기부 연계하는 확장성을 설계에 포함하고 있어, UN SDGs(빈곤 퇴치, 기아 종식, 기후변화 대응, 책임 있는 소비·생산 등)에 기여하는 사회적 가치를 지향합니다.
+
+본 저장소(`BE`)는 FoodLink의 백엔드 API 서버로, Node.js + Express 기반으로 구현되었으며 AWS EC2 위에서 Docker Compose로 운영됩니다.
 
 ---
 
 ## 문제 정의
 
-FoodLink 서비스가 필요로 하는 데이터 처리와 비즈니스 로직을 클라이언트로부터 분리하여 안정적으로 제공하는 것이 이 백엔드 서버의 핵심 목표입니다. 구체적으로는 다음 문제를 해결합니다.
+FoodLink는 세 가지 페인 포인트의 교차점에서 출발합니다.
 
-- 사용자 인증 및 권한 관리를 안전하게 처리하는 API 계층이 필요했습니다.
-- 이미지나 파일 업로드를 서버 디스크가 아닌 클라우드(AWS S3)에 위임하여 확장성을 확보해야 했습니다.
-- 팀 협업을 위해 API 명세를 자동으로 문서화하는 수단이 필요했습니다.
-- 로컬 개발 환경과 운영 배포 환경을 일관성 있게 유지하고, 코드 변경 시 자동으로 배포되는 파이프라인이 필요했습니다.
+**1. 환경적 위기**
+매년 전 세계에서 10억 톤 이상의 음식물이 버려지며 탄소 배출과 환경 파괴로 이어집니다. 음식물 쓰레기는 기후 위기의 주요 원인 중 하나임에도 불구하고, 이를 줄이기 위한 일상적인 접점은 부족한 상황입니다.
+
+**2. 소상공인의 부담**
+동네 카페, 개인 마트, 소규모 식당은 당일 팔리지 않은 재고를 폐기하면서 경제적 손실과 쓰레기 처리 비용을 동시에 부담합니다. 기존 마감 할인 앱들은 대형 프랜차이즈 중심으로 운영되어, 소규모 자영업자가 활용할 수 있는 유통 채널이 사실상 없었습니다.
+
+**3. 식비 부담과 정보 비대칭**
+학생, 자취생, 식사 취약계층은 고물가 속에서 식비 부담이 가중되고 있습니다. 주변에 저렴하게 구할 수 있는 마감 상품이 존재하더라도, 그 정보가 필요한 사람에게 제때 전달되지 않는 구조적 비대칭이 존재합니다.
+
+FoodLink는 이 세 문제를 **위치 기반 실시간 매칭**으로 동시에 해결하고자 합니다. 버려질 음식을 필요한 사람과 연결함으로써, 소상공인의 손실을 줄이고, 수요자에게는 합리적인 식사 기회를 제공하며, 지역 사회의 자원 순환망을 형성합니다.
 
 ---
 
 ## 주요 기능
 
-- **사용자 인증**: JWT 기반 토큰 발급 및 검증, bcrypt를 이용한 비밀번호 해싱 처리 (`package.json`의 `jsonwebtoken`, `bcrypt` 의존성 기준)
+FoodLink는 **매장 점주(store)**와 **일반 사용자(user)** 두 역할을 기준으로 API가 구성됩니다.
 
-- **파일 업로드 (AWS S3 연동)**: multer와 multer-s3를 사용한 파일 수신 및 AWS S3 업로드 처리 (`@aws-sdk/client-s3`, `multer-s3` 의존성 기준)
+**인증 및 계정 관리**
+- 매장 점주 회원가입 (`POST /api/store/accounts/signup`) — 매장명, 주소, 위치 좌표(lat/lng), 사업자번호, 인증 이미지 등록 포함
+- 일반 사용자 회원가입 (`POST /api/user/accounts/signup`) — 닉네임, 이메일, 비밀번호 입력
+- 매장 점주 / 일반 사용자 로그인·로그아웃 (`POST /api/store/accounts/login`, `/api/user/accounts/login`)
+- JWT 기반 액세스 토큰 발급 및 `authMiddleware`를 통한 인증 처리
 
-- **데이터베이스 연동**: Sequelize ORM을 통한 MySQL 데이터 모델 정의 및 CRUD 처리 (`mysql2`, `sequelize` 의존성 기준)
+**위치 기반 상품 조회** (일반 사용자)
+- 현재 위치(lat/lng) 기준 반경 내 마감 임박 상품 목록 조회 (`GET /api/user/items/nearby?lat=&lng=&radius=`, 기본 반경 500m)
+- 특정 매장의 잔여 아이템 목록 조회 (`GET /api/user/items/stores/:storeId`)
 
-- **API 문서화**: swagger-jsdoc + swagger-ui-express를 통한 API 스펙 자동 생성 및 웹 UI 제공 (`swagger-jsdoc`, `swagger-ui-express` 의존성 기준)
+**상품 등록 및 관리** (매장 점주)
+- 마감 임박 상품 등록 (`POST /api/store/item/add`) — 상품명, 수량, 가격, 유형(`GIVE` 무료 나눔 / `SELL` 할인 판매), 픽업 가능 시간대, 이미지 포함
+- 나눔 현황 조회 (`GET /api/store/items/summary`)
+- 활성 나눔 물품 목록 조회 (`GET /api/store/items?status=ACTIVE`)
+- 나눔 물품 삭제 (`DELETE /api/store/items/:itemId`)
 
-- **HTTPS 지원 및 리버스 프록시**: Nginx를 통해 80/443 포트 처리 및 Let's Encrypt SSL 인증서 적용 (`docker-compose.yml`, `nginx/conf.d` 폴더 기준)
+**예약 시스템**
+- 일반 사용자: 아이템 예약 수량 선택 (`GET /api/user/reserve/items/:itemId`), 예약하기 (`POST /api/user/reserve/items/:itemId`), 예약 목록 조회 (`GET /api/user/reserve`), 예약 상세 정보 조회 (`GET /api/user/reserve/reservations/:reservationId`)
+- 매장 점주: 예약 목록 확인 (`GET /store/reservations?status=CONFIRMED`), 픽업 완료 처리 (`PATCH /api/store/reservations/:reservationId/pickup`), 예약 취소 처리 (`PATCH /api/store/reservations/:reservationId/cancel`)
+- 예약 상태는 `CONFIRMED → PICKUP 또는 NOSHOW / CANCEL` 흐름으로 관리
 
-- **자동 배포 (CD)**: GitHub Actions `deploy.yml` 워크플로우를 통해 `main` 브랜치 머지 시 자동 배포 (Actions 탭 기준, 총 18회 배포 이력 확인)
+**API 문서화**
+- swagger-jsdoc + swagger-ui-express로 라우터 코드 내 JSDoc 주석 기반 OpenAPI 문서 자동 생성
+- 매장 점주용 / 일반 사용자용 엔드포인트 분리 구성
 
 ---
 
@@ -92,20 +115,23 @@ MySQL 데이터는 `mysql-data` Named Volume으로 관리되어 컨테이너를 
 
 ## 핵심 구현 포인트
 
-**1. Docker Compose를 활용한 멀티 컨테이너 구성**
-Node.js, MySQL, Nginx 세 서비스를 단일 `docker-compose.yml`로 정의하고 `foodlink-network`로 연결했습니다. `depends_on`으로 MySQL이 준비된 뒤 Node 컨테이너가 실행되도록 순서를 제어했으며, `restart: always`로 장애 복구를 자동화했습니다. (`docker-compose.yml` 기준)
+**1. 역할 기반 라우터 분리 구조 (store / user)**
+매장 점주와 일반 사용자의 API를 `routes/store`와 `routes/user`로 명확히 분리했습니다. 각 라우터는 기능 단위로 세분화되어 있으며(`productRegisterRouter`, `reservationCancelRouter`, `reservationListRouter` 등), `authMiddleware.js`를 통해 JWT 토큰 검증을 공통으로 처리합니다. 역할에 따른 접근 제어를 라우터 계층에서 명확히 구분한 것이 특징입니다.
 
-**2. GitHub Actions를 이용한 CD 파이프라인**
-`main` 브랜치에 PR이 머지될 때마다 GitHub Actions의 `deploy.yml` 워크플로우가 자동 실행됩니다. Actions 탭에서 총 18회의 CD 실행 이력이 확인되며, 대부분 `develop` → `main` PR 머지를 트리거로 합니다. 이를 통해 수동 배포 없이 코드 변경이 즉시 서버에 반영됩니다.
+**2. 3계층 아키텍처 (Controller — Service — Model)**
+요청 처리 흐름을 Controller → Service → Model로 명확히 분리했습니다. `itemController.js`는 요청/응답만 담당하고, 실제 비즈니스 로직은 `itemService.js`에서 처리하며, DB 접근은 Sequelize 모델(`item.js`, `reservation.js` 등)이 담당합니다. 관심사 분리를 통해 각 계층의 역할을 명확히 하고 유지보수성을 높였습니다.
 
-**3. Nginx를 활용한 HTTPS 리버스 프록시**
-Let's Encrypt SSL 인증서(`fullchain.pem`, `privkey.pem`)를 Nginx 컨테이너에 볼륨으로 마운트하여 HTTPS를 적용했습니다. 외부 트래픽은 Nginx가 80/443에서 수신하고, 내부적으로 Node.js 컨테이너의 3000 포트로 프록시합니다. (`docker-compose.yml`의 nginx 서비스 volumes 기준)
+**3. 위치 기반 주변 상품 조회**
+`GET /api/user/items/nearby` 엔드포인트는 클라이언트로부터 위도(lat)·경도(lng)·반경(radius, 기본값 500m)을 파라미터로 받아 주변 매장의 마감 임박 상품을 조회합니다. `itemController.js` → `itemService.js`로 이어지는 흐름에서 좌표 기반 필터링 로직이 핵심 구현 포인트입니다.
 
-**4. AWS S3 기반 파일 업로드 아키텍처**
-`multer`로 multipart/form-data를 수신하고, `multer-s3`와 `@aws-sdk/client-s3`를 조합하여 서버 로컬 디스크를 거치지 않고 S3에 직접 업로드하는 스트리밍 파이프라인을 구성했습니다. 서버 디스크 I/O 부담을 줄이고, 업로드된 파일의 영속성과 확장성을 확보합니다. (`package.json` 의존성 기준)
+**4. 예약 상태 머신 설계**
+예약 데이터는 `CONFIRMED → PICKUP 또는 NOSHOW / CANCEL`의 상태 흐름으로 관리됩니다. `reservationCancelRouter`, `reservationStatusRouter`가 각 상태 전환을 담당하며, `reserveService.js`에서 상태 변경 비즈니스 로직을 처리합니다.
 
-**5. Swagger를 통한 API 문서 자동화**
-`swagger-jsdoc`으로 라우터 코드의 JSDoc 주석을 파싱해 OpenAPI 스펙을 자동 생성하고, `swagger-ui-express`로 웹 브라우저에서 탐색 가능한 API 문서 UI를 제공합니다. 팀 내 프론트엔드와의 API 계약을 코드와 함께 관리할 수 있도록 구성했습니다. (`package.json` 의존성 기준)
+**5. multer-S3를 활용한 스트리밍 파일 업로드**
+`utils/upload.js`에서 multer와 multer-s3를 조합하여 파일 업로드 파이프라인을 구성했습니다. 서버 로컬 디스크를 거치지 않고 S3에 직접 스트리밍 업로드하며, `s3Config.js`에서 AWS 클라이언트 설정을 분리 관리합니다. 매장 인증 이미지(`verifiedImage.js` 모델)와 상품 이미지(`item.js` 모델) 두 종류의 이미지 업로드에 동일한 파이프라인을 재사용합니다.
+
+**6. Docker Compose 기반 멀티 컨테이너 운영 및 GitHub Actions CD**
+Node.js, MySQL, Nginx 세 컨테이너를 `foodlink-network`로 묶어 단일 `docker-compose.yml`로 관리합니다. Nginx는 Let's Encrypt SSL 인증서를 볼륨으로 마운트하여 HTTPS 리버스 프록시 역할을 수행합니다. `main` 브랜치에 PR이 머지될 때마다 GitHub Actions `deploy.yml`이 자동 실행되며, 총 18회의 배포 이력이 Actions 탭에서 확인됩니다.
 
 ---
 
@@ -173,16 +199,60 @@ docker compose logs -f node
 
 ```
 BE/
-├── .github/                # GitHub Actions 워크플로우 및 이슈/PR 템플릿
+├── .github/                        # GitHub Actions 워크플로우 및 이슈/PR 템플릿
 │   └── workflows/
-│       └── deploy.yml      # CD 파이프라인 (main 브랜치 자동 배포)
+│       └── deploy.yml              # CD 파이프라인 (main 브랜치 자동 배포)
 ├── nginx/
-│   └── conf.d/             # Nginx 설정 파일 (리버스 프록시, HTTPS)
-├── src/                    # 애플리케이션 소스 코드 (상세 구조 확인 필요)
-├── app.js                  # 애플리케이션 엔트리포인트 (Express 앱 초기화)
-├── Dockerfile              # Node.js 20 Alpine 기반 프로덕션 이미지 정의
-├── docker-compose.yml      # Node, MySQL, Nginx 멀티 컨테이너 구성
-├── package.json            # 의존성 및 npm 스크립트 정의
+│   └── conf.d/                     # Nginx 설정 파일 (리버스 프록시, HTTPS)
+├── src/
+│   ├── config/
+│   │   ├── config.js               # 환경 변수 및 앱 설정
+│   │   ├── s3Config.js             # AWS S3 클라이언트 설정
+│   │   └── swaggerConfig.js        # Swagger 문서 설정
+│   ├── controllers/
+│   │   ├── store/
+│   │   │   └── storeController.js  # 매장 관련 요청 처리
+│   │   └── user/
+│   │       ├── itemController.js   # 상품 조회 요청 처리
+│   │       ├── reserveController.js# 예약 요청 처리
+│   │       └── userController.js   # 유저 인증 요청 처리
+│   ├── middlewares/
+│   │   └── authMiddleware.js       # JWT 토큰 검증 미들웨어
+│   ├── models/
+│   │   ├── index.js                # Sequelize 초기화 및 모델 연결
+│   │   ├── item.js                 # 상품 모델
+│   │   ├── reservation.js          # 예약 모델
+│   │   ├── store.js                # 매장 모델
+│   │   ├── user.js                 # 유저 모델
+│   │   └── verifiedImage.js        # 매장 인증 이미지 모델
+│   ├── routes/
+│   │   ├── store/
+│   │   │   ├── index.js
+│   │   │   ├── productRegisterRouter.js    # 상품 등록 라우터
+│   │   │   ├── reservationCancelRouter.js  # 예약 취소/노쇼 라우터
+│   │   │   ├── reservationListRouter.js    # 예약 목록 라우터
+│   │   │   ├── reservationStatusRouter.js  # 예약 상태 변경 라우터
+│   │   │   └── storeRoute.js               # 매장 인증 라우터
+│   │   ├── user/
+│   │   │   ├── index.js
+│   │   │   ├── itemRoute.js        # 상품 조회 라우터
+│   │   │   ├── reserveRoute.js     # 예약 라우터
+│   │   │   └── userRoute.js        # 유저 인증 라우터
+│   │   ├── health.js               # 서버 상태 확인 라우터
+│   │   └── index.js                # 전체 라우터 진입점
+│   ├── services/
+│   │   ├── store/
+│   │   │   └── storeService.js     # 매장 비즈니스 로직
+│   │   └── user/
+│   │       ├── itemService.js      # 상품 비즈니스 로직
+│   │       ├── reserveService.js   # 예약 비즈니스 로직
+│   │       └── userService.js      # 유저 비즈니스 로직
+│   └── utils/
+│       └── upload.js               # multer-S3 파일 업로드 유틸
+├── app.js                          # Express 앱 초기화 및 미들웨어 등록
+├── Dockerfile                      # Node.js 20 Alpine 기반 프로덕션 이미지 정의
+├── docker-compose.yml              # Node, MySQL, Nginx 멀티 컨테이너 구성
+├── package.json                    # 의존성 및 npm 스크립트 정의
 └── .gitignore
 ```
 

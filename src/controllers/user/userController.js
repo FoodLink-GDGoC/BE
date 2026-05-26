@@ -68,3 +68,18 @@ exports.login = async (req, res) => {
     });
   }
 };
+
+exports.logout = async (req, res) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      message: '로그아웃 됐어요.',
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: '로그아웃 중 오류가 발생했어요.',
+      error: {},
+    });
+  }
+};
